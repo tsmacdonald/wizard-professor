@@ -42,3 +42,15 @@
 (defun edit-distance (source target &optional (scores (make-edit-scores)))
   (clrhash *results*)
   (memoized-edit-distance source target scores))
+
+(defun word-and-score (source target)
+  (cons target (edit-distance source target)))
+
+(defun correct (word &optional (context ()))
+  (if (find word *words* :test #'string-equal)
+      word
+      (car (reduce
+	    (lambda (x y) (if (< (cdr x) (cdr y)) x y))
+	    (mapcar (lambda (candidate)
+		      (word-and-score word candidate))
+		    *words*)))))

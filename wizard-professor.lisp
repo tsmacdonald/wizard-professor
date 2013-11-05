@@ -27,17 +27,22 @@
      (reduce #'min
 	     (remove nil
 		     (list
-		      (+ (edit-scores-insert-cost scores) (memoized-edit-distance source (subseq target 1) scores))
-		      (+ (edit-scores-delete-cost scores) (memoized-edit-distance (subseq source 1) target scores))
-		      (+ (edit-scores-substitute-cost scores) (memoized-edit-distance (subseq source 1) (subseq target 1) scores))
+		      (+ (edit-scores-insert-cost scores)
+			 (memoized-edit-distance source (subseq target 1) scores))
+		      (+ (edit-scores-delete-cost scores)
+			 (memoized-edit-distance (subseq source 1) target scores))
+		      (+ (edit-scores-substitute-cost scores)
+			 (memoized-edit-distance (subseq source 1) (subseq target 1) scores))
 		      (when (and
 			     (>= (length source) 2)
 			     (>= (length target) 2)
 			     (char-equal (char source 0) (char target 1))
 			     (char-equal (char target 0) (char source 1)))
-			(+ (edit-scores-transpose-cost scores) (memoized-edit-distance (subseq source 2) (subseq target 2) scores)))
+			(+ (edit-scores-transpose-cost scores)
+			   (memoized-edit-distance (subseq source 2) (subseq target 2) scores)))
 		      (when (char-equal (char source 0) (char target 0))
-			(+ (edit-scores-nop-cost scores) (memoized-edit-distance (subseq source 1) (subseq target 1) scores)))))))))
+			(+ (edit-scores-nop-cost scores)
+			   (memoized-edit-distance (subseq source 1) (subseq target 1) scores)))))))))
 
 (defun edit-distance (source target &optional (scores (make-edit-scores)))
   (clrhash *results*)

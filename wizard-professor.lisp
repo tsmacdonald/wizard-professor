@@ -2,6 +2,9 @@
 
 (in-package #:wizard-professor)
 
+(defparameter *alpha* .01)
+(defparameter *edit-tolerance* 6)
+
 (defparameter *words*
   (with-open-file (in "/usr/share/dict/words")
     (loop for line = (read-line in nil) while line collect line)))
@@ -51,11 +54,70 @@
 (defun word-and-score (source target)
   (cons target (edit-distance source target)))
 
+(defun in-dictionary-p (word)
+  (find word *words* :test (lambda (x y) (string-equal (string-downcase x) (string-downcase y)))))
+
 (defun correct (word &optional (context ()))
-  (if (find word *words* :test #'string-equal)
+  (if (in-dictionary-p word)
       word
       (car (reduce
 	    (lambda (x y) (if (< (cdr x) (cdr y)) x y))
 	    (mapcar (lambda (candidate)
 		      (word-and-score word candidate))
 		    *words*)))))
+
+(defun correct2 (a b word frequencies)
+  (if (and (in-dictionary-p word)
+	   (>= (probability a b word frequencies) *alpha*))
+      word ;;It's not an error
+      (let*
+	  ((candidates
+	    (mapcar (lambda (w-a-s) (cons (probability a b (car w-a-s) frequencies)
+					  (car w-a-s)))
+		    (sort (remove-if-not
+			   (lambda (word-and-score) (<= (cdr word-and-score) *edit-tolerance*))
+			   (mapcar (lambda (target) (word-and-score word target)) *words*))
+			  (lambda (x y) (if (< (cdr x) (cdr y)) x y)))))
+	   ;;Candidates is now a list of probability-word conses
+	   (best (apply #'max (mapcar #'car candidates))))
+	(cdr (assoc best candidates)))))
+
+(defun correct-line (line)
+  (format nil "~{~A~^  ~}" (mapcar #'correct (cl-ppcre:split "\\s+" line))))
+
+(defun correct-file (filename &optional (output-stream t))
+  (with-open-file (in filename)
+    (when in
+      (loop for line = (read-line in nil)
+         while line do (format output-stream "~s" (correct-line line))))))
+
+(defun train-trigram-model (file)
+  (with-open-file (in file)
+    (let ((frequencies (make-hash-table :test 'equal)))
+      (flet ((e-gethash (key table default)
+	       (alexandria:ensure-gethash key table default)))
+	(when in
+	  (loop for line = (read-line in nil)
+	     while line do
+	       (let ((words (append '(nil) '(nil) (mapcar #'string-downcase (cl-ppcre:split "[^\\w']+" line)))))
+		 (loop for (a b c) on words
+		    do
+		      (when c
+			(e-gethash c
+				   (e-gethash b
+					      (e-gethash a frequencies (make-hash-table :test 'equal))
+					      (make-hash-table :test 'equal))
+				   0)
+			(incf (gethash c (gethash b (gethash a frequencies))))))))))
+      frequencies)))
+		    
+
+(defun counts-for (a b frequencies)
+  (gethash b (gethash a frequencies (make-hash-table :test 'equal)) (make-hash-table :test 'equal)))
+
+(defun probability (a b c frequencies &optional (k 1))
+  (let* ((counts (counts-for a b frequencies))
+	 (total (loop for count being the hash-values of counts summing count))
+	 (size (hash-table-size counts)))
+    (/ (+ (gethash c counts 0) k)
+       (+ total (* k size)))))

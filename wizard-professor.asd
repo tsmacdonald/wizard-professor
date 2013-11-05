@@ -7,5 +7,6 @@
   :license "MIT License"
   :depends-on (#:cl-ppcre #:fare-memoization)
   :components ((:file "package")
-               (:file "wizard-professor")))
+               (:file "wizard-professor")
+	       (:file "alexandria"))
 

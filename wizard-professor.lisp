@@ -9,6 +9,8 @@
   (with-open-file (in "/usr/share/dict/words")
     (loop for line = (read-line in nil) while line collect line)))
 
+(defparameter *frequencies* (train-trigram-model "corpus/brown-corpus-clean"))
+
 (defparameter *results* (make-hash-table :test 'equal))
 
 (defstruct edit-scores
@@ -82,14 +84,17 @@
 	   (best (apply #'max (mapcar #'car candidates))))
 	(cdr (assoc best candidates)))))
 
-(defun correct-line (line)
-  (format nil "~{~A~^  ~}" (mapcar #'correct (cl-ppcre:split "\\s+" line))))
+(defun correct-line (line frequencies)
+  (format nil "~{~A~^  ~}"
+	  (remove-if #'null (loop for (a b c) on (append '(nil) '(nil) (cl-ppcre:split "[^\\w']+" line))
+			       collecting (correct2 a b c frequencies)))))
+					       
 
 (defun correct-file (filename &optional (output-stream t))
   (with-open-file (in filename)
     (when in
       (loop for line = (read-line in nil)
-         while line do (format output-stream "~s" (correct-line line))))))
+         while line do (format output-stream "~s" (correct-line line *frequencies*))))))
 
 (defun train-trigram-model (file)
   (with-open-file (in file)

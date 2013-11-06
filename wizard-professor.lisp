@@ -2,14 +2,12 @@
 
 (in-package #:wizard-professor)
 
-(defparameter *alpha* .01)
+(defparameter *alpha* .0005)
 (defparameter *edit-tolerance* 6)
 
 (defparameter *words*
   (with-open-file (in "/usr/share/dict/words")
     (loop for line = (read-line in nil) while line collect line)))
-
-(defparameter *frequencies* (train-trigram-model "corpus/brown-corpus-clean"))
 
 (defparameter *results* (make-hash-table :test 'equal))
 
@@ -90,11 +88,11 @@
 			       collecting (correct2 a b c frequencies)))))
 					       
 
-(defun correct-file (filename &optional (output-stream t))
+(defun correct-file (frequencies filename &optional (output-stream t))
   (with-open-file (in filename)
     (when in
       (loop for line = (read-line in nil)
-         while line do (format output-stream "~s" (correct-line line *frequencies*))))))
+         while line do (format output-stream "~s" (correct-line line frequencies))))))
 
 (defun train-trigram-model (file)
   (with-open-file (in file)

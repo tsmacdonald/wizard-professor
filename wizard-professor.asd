@@ -5,8 +5,7 @@
   :description "A spell-checker"
   :author "Tim Macdonald <tsmacdonald@gmail.com>"
   :license "MIT License"
-  :depends-on (#:cl-ppcre #:fare-memoization)
+  :depends-on (#:cl-ppcre #:fare-memoization #:alexandria)
   :components ((:file "package")
-               (:file "wizard-professor")
-	       (:file "alexandria"))
+               (:file "wizard-professor")))
 

@@ -3,7 +3,7 @@
 (in-package #:wizard-professor)
 
 (defparameter *alpha* .0005)
-(defparameter *edit-tolerance* 6)
+(defparameter *edit-tolerance* 4)
 
 (defparameter *words*
   (with-open-file (in "/usr/share/dict/words")

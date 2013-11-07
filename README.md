@@ -29,10 +29,17 @@ Note that the precise edit distance is not a factor--with the current configurat
 
 ## Testing
 
-Testing was very *ad hoc*. A trigram was found in the corpus, and the third word would be misspelled with both a misspelled word and a real (but improbable) word. The parameters (particularly `*alpha*`) were tuned until satisfactory results were fonud.
+Testing was very *ad hoc*. A trigram was found in the corpus, and the third word would be misspelled with both a misspelled word and a real (but improbable) word. The parameters (particularly `*alpha*`) were tuned until satisfactory results were found.
 
 ## Results
 
 Results vary wildly depending on the usefulness of the corpus. When trained with the Baum corpus, the spell-checker performed very well with Baumish phrases (even correcting "said the drab" to "said the crab"), but did not generalize very well. The Brown corpus was then used for a more comprehensive treatment of English, but still suffers notably ("the depressing prat is" => "the repressing writ is", not "the depressing part is"). "prat" being a real word, this means that the trigram model is not tuned well. This would hopefully be solved by more and better data.
 
-Performance is also an issue. Apart from memoizing `EDIT-DISTANCE` and using a mature implementation (SBCL) of a compiled language (Common Lisp), correcting a four-word phrase takes around 64 seconds (although all hardware available was being used for statistical work at the same time, presumably slowing things down by a factor of three (a core split time between two R jobs and Wizard Professor).
+Performance is also an issue. Apart from memoizing `EDIT-DISTANCE` and using a mature implementation (SBCL) of a compiled language (Common Lisp), correcting a four-word phrase takes around 64 seconds (although all hardware available was being used for statistical work at the same time, presumably slowing things down by a factor of three (a core split time between two R jobs and Wizard Professor)).
+
+## Potential Future Enhancements
+
+* Using a better corpus. Or even sanitizing the current one better.
+* Using Good-Turing smoothing instead of Laplace smoothing.
+* Tweaking `*alpha*` and `*edit-tolerance*` further.
+* Incorporating different edit distances when choosing between candidates (somehow finding p-values for each edit-distance and incorporating that into the trigram probability)

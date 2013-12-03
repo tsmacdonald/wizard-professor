@@ -42,4 +42,4 @@ Performance is also an issue. Apart from memoizing `EDIT-DISTANCE` and using a m
 * Using a better corpus. Or even sanitizing the current one better.
 * Using Good-Turing smoothing instead of Laplace smoothing.
 * Tweaking `*alpha*` and `*edit-tolerance*` further.
-* Incorporating different edit distances when choosing between candidates (somehow finding p-values for each edit-distance and incorporating that into the trigram probability)
+* Incorporating different edit distances when choosing between candidates (somehow finding p-values for each edit-distance and incorporating that into the trigram probability).

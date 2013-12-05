@@ -37,6 +37,12 @@ Results vary wildly depending on the usefulness of the corpus. When trained with
 
 Performance is also an issue. Apart from memoizing `EDIT-DISTANCE` and using a mature implementation (SBCL) of a compiled language (Common Lisp), correcting a four-word phrase takes around 64 seconds (although all hardware available was being used for statistical work at the same time, presumably slowing things down by a factor of three (a core split time between two R jobs and Wizard Professor)).
 
+## Corpora
+
+* Novels by Frank L. Baum (used during development).
+* A converted form of the Brown corpus (used to train trigram model).
+* The Holbrook corpus of misspellings, taken from [here](http://www.dcs.bbk.ac.uk/~ROGER/corpora.html).
+
 ## Potential Future Enhancements
 
 * Using a better corpus. Or even sanitizing the current one better.

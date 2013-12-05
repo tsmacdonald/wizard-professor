@@ -57,16 +57,7 @@
 (defun in-dictionary-p (word)
   (find word *words* :test (lambda (x y) (string-equal (string-downcase x) (string-downcase y)))))
 
-(defun correct (word &optional (context ()))
-  (if (in-dictionary-p word)
-      word
-      (car (reduce
-	    (lambda (x y) (if (< (cdr x) (cdr y)) x y))
-	    (mapcar (lambda (candidate)
-		      (word-and-score word candidate))
-		    *words*)))))
-
-(defun correct2 (a b word frequencies)
+(defun correct (a b word frequencies)
   (if (and (in-dictionary-p word)
 	   (>= (probability a b word frequencies) *alpha*))
       word ;;It's not an error
@@ -85,7 +76,7 @@
 (defun correct-line (line frequencies)
   (format nil "~{~A~^  ~}"
 	  (remove-if #'null (loop for (a b c) on (append '(nil) '(nil) (cl-ppcre:split "[^\\w']+" line))
-			       collecting (correct2 a b c frequencies)))))
+			       collecting (correct a b c frequencies)))))
 					       
 
 (defun correct-file (frequencies filename &optional (output-stream t))

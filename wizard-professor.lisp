@@ -4,6 +4,7 @@
 
 (defparameter *alpha* .0005)
 (defparameter *edit-tolerance* 4)
+(defparameter +word-separator+ "[^\\w']+")
 
 (defparameter *words*
   (with-open-file (in "/usr/share/dict/words")
@@ -63,19 +64,20 @@
       word ;;It's not an error
       (let*
 	  ((candidates
-	    (mapcar (lambda (w-a-s) (cons (probability a b (car w-a-s) frequencies)
-					  (car w-a-s)))
-		    (sort (remove-if-not
-			   (lambda (word-and-score) (<= (cdr word-and-score) *edit-tolerance*))
-			   (mapcar (lambda (target) (word-and-score word target)) *words*))
-			  (lambda (x y) (if (< (cdr x) (cdr y)) x y)))))
+	    (cons (cons 0 word)
+		  (mapcar (lambda (w-a-s) (cons (probability a b (car w-a-s) frequencies)
+						(car w-a-s)))
+			  (sort (remove-if-not
+				 (lambda (word-and-score) (<= (cdr word-and-score) *edit-tolerance*))
+				 (mapcar (lambda (target) (word-and-score word target)) *words*))
+				(lambda (x y) (if (< (cdr x) (cdr y)) x y))))))
 	   ;;Candidates is now a list of probability-word conses
 	   (best (apply #'max (mapcar #'car candidates))))
 	(cdr (assoc best candidates)))))
 
 (defun correct-line (line frequencies)
   (format nil "~{~A~^  ~}"
-	  (remove-if #'null (loop for (a b c) on (append '(nil) '(nil) (cl-ppcre:split "[^\\w']+" line))
+	  (remove-if #'null (loop for (a b c) on (append '(nil) '(nil) (cl-ppcre:split +word-separator+ line))
 			       collecting (correct a b c frequencies)))))
 					       
 
@@ -93,7 +95,7 @@
 	(when in
 	  (loop for line = (read-line in nil)
 	     while line do
-	       (let ((words (append '(nil) '(nil) (mapcar #'string-downcase (cl-ppcre:split "[^\\w']+" line)))))
+	       (let ((words (append '(nil) '(nil) (mapcar #'string-downcase (cl-ppcre:split +word-separator+ line)))))
 		 (loop for (a b c) on words
 		    do
 		      (when c
@@ -117,3 +119,4 @@
 	0
 	(/ (+ (gethash c counts 0) k)
 	   (+ total (* k size))))))
+

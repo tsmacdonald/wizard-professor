@@ -112,6 +112,8 @@
 (defun probability (a b c frequencies &optional (k 1))
   (let* ((counts (counts-for a b frequencies))
 	 (total (loop for count being the hash-values of counts summing count))
-	 (size (hash-table-size counts)))
-    (/ (+ (gethash c counts 0) k)
-       (+ total (* k size)))))
+	 (size (hash-table-count counts)))
+    (if (and (zerop total) (zerop size))
+	0
+	(/ (+ (gethash c counts 0) k)
+	   (+ total (* k size))))))

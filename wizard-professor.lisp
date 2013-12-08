@@ -87,25 +87,29 @@
       (loop for line = (read-line in nil)
          while line do (format output-stream "~&~A" (correct-line line frequencies))))))
 
-(defun train-trigram-model (file)
+(defun train-trigram-model (file &optional (verbose nil))
   (with-open-file (in file)
     (let ((frequencies (make-hash-table :test 'equal)))
       (flet ((e-gethash (key table default)
 	       (alexandria:ensure-gethash key table default)))
 	(when in
-	  (loop for line = (read-line in nil)
-	     while line do
-	       (let ((words (append '(nil) '(nil) (mapcar #'string-downcase (cl-ppcre:split +word-separator+ line)))))
-		 (loop for (a b c) on words
-		    do
-		      (when c
-			(e-gethash c
-				   (e-gethash b
-					      (e-gethash a frequencies (make-hash-table :test 'equal))
-					      (make-hash-table :test 'equal))
-				   0)
-			(incf (gethash c (gethash b (gethash a frequencies))))))))))
-      frequencies)))
+	  (let ((line-count 0))
+	    (loop for line = (read-line in nil)
+	       while line do
+		 (incf line-count)
+		 (when (and verbose (zerop (mod line-count (if (numberp verbose) verbose 1000))))
+		   (format t "~&On line ~A" line-count))
+		 (let ((words (append '(nil) '(nil) (mapcar #'string-downcase (cl-ppcre:split +word-separator+ line)))))
+		   (loop for (a b c) on words
+		      do
+			(when c
+			  (e-gethash c
+				     (e-gethash b
+						(e-gethash a frequencies (make-hash-table :test 'equal))
+						(make-hash-table :test 'equal))
+				     0)
+			  (incf (gethash c (gethash b (gethash a frequencies))))))))))
+	frequencies))))
 		    
 
 (defun counts-for (a b frequencies)

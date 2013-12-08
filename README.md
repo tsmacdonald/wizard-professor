@@ -42,6 +42,7 @@ Performance is also an issue. Apart from memoizing `EDIT-DISTANCE` and using a m
 * Novels by Frank L. Baum (used during development).
 * A converted form of the Brown corpus (used to train trigram model).
 * The Holbrook corpus of misspellings, taken from [here](http://www.dcs.bbk.ac.uk/~ROGER/corpora.html).
+* The `big.txt` corpus of Gutenberg material compiled by Peter Norvig.
 
 ## Potential Future Enhancements
 

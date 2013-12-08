@@ -85,7 +85,7 @@
   (with-open-file (in filename)
     (when in
       (loop for line = (read-line in nil)
-         while line do (format output-stream "~s" (correct-line line frequencies))))))
+         while line do (format output-stream "~&~A" (correct-line line frequencies))))))
 
 (defun train-trigram-model (file)
   (with-open-file (in file)

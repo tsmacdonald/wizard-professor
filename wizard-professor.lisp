@@ -2,8 +2,8 @@
 
 (in-package #:wizard-professor)
 
-(defparameter *alpha* .0005)
-(defparameter *edit-tolerance* 4)
+(defparameter *alpha* .0001)
+(defparameter *edit-tolerance* 3)
 (defparameter +word-separator+ "[^\\w']+")
 
 (defparameter *words*
@@ -80,6 +80,15 @@
 	  (remove-if #'null (loop for (a b c) on (append '(nil) '(nil) (cl-ppcre:split +word-separator+ line))
 			       collecting (correct a b c frequencies)))))
 					       
+
+(defun correct-and-write-file (frequencies in-file out-file)
+  (with-open-file (out out-file :if-does-not-exist :create :if-exists :supersede :direction :output)
+    (correct-file frequencies in-file out)))
+
+(defun batch-process (frequencies in-file out-file-base id-number)
+  (let* ((*edit-tolerance* (+ 3 (floor (/ (1- id-number) 4))))
+	 (*alpha* (elt '(.001 .0005 .0003 .0001) (mod id-number 4))))
+    (correct-and-write-file frequencies in-file (format nil "~A-~A-~,4f" out-file-base *edit-tolerance* *alpha*))))
 
 (defun correct-file (frequencies filename &optional (output-stream t))
   (with-open-file (in filename)

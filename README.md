@@ -35,7 +35,7 @@ Testing was very *ad hoc*. A trigram was found in the corpus, and the third word
 
 Results vary wildly depending on the usefulness of the corpus. When trained with the Baum corpus, the spell-checker performed very well with Baumish phrases (even correcting "said the drab" to "said the crab"), but did not generalize very well. The Brown corpus was then used for a more comprehensive treatment of English, but still suffers notably ("the depressing prat is" => "the repressing writ is", not "the depressing part is"). "prat" being a real word, this means that the trigram model is not tuned well. This would hopefully be solved by more and better data.
 
-Performance is also an issue. Apart from memoizing `EDIT-DISTANCE` and using a mature implementation (SBCL) of a compiled language (Common Lisp), correcting a four-word phrase takes around 64 seconds (although all hardware available was being used for statistical work at the same time, presumably slowing things down by a factor of three (a core split time between two R jobs and Wizard Professor)).
+Performance is also an issue. Apart from memoizing `EDIT-DISTANCE` and using a mature implementation (SBCL) of a compiled language (Common Lisp), no explicit steps were taken. Correcting a four-word phrase takes around 64 seconds (although all hardware available was being used for statistical work at the same time, presumably slowing things down by a factor of three (a core split time between two R jobs and Wizard Professor)).
 
 ## Corpora
 
